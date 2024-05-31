@@ -3,6 +3,7 @@ from langchain_core.prompts import PromptTemplate
 from langchain_community.chat_models import ChatOpenAI
 from langchain_community.utilities import SerpAPIWrapper
 from langchain_community.document_loaders import NewsURLLoader, YoutubeLoader
+from langchain_core.output_parsers import JsonOutputParser
 
 class DocumentProcessor:
     """
@@ -44,13 +45,13 @@ class DocumentProcessor:
         try:
             result = serp_api.results(query=text)
             if result and 'organic_results' in result:
-                for organic in result['organic_results']:
-                    print(f"Title: {organic.get('title')}, snippet:  {organic.get('snippet')}, link: {organic.get('link')}")
+                return result
             else:
                 print("No detailed organic results found.")
+                return None
         except ValueError as e:
             print(f"Search failed: {e}")
-        return result
+            return None
 
     def load_news_documents(self, urls):
         """
@@ -65,3 +66,22 @@ class DocumentProcessor:
         """
         loader = YoutubeLoader(urls, language=["ko"], add_video_info=True)
         return loader.load()
+    
+    def fact_check_api(self, headline, snippets):
+        llm = ChatOpenAI(api_key=self.openai_api_key, temperature=0.0, model="gpt-4o")
+        prompt = PromptTemplate.from_template("""
+                                            헤드라인 = {headline}
+                                            검색결과 = {snippets}
+                                            헤드라인이 사실인지 검색결과를 통해 판단해줘
+                                            헤드라인의 신뢰도를 0부터 100 정수형으로 반환해줘.
+                                            그리고 그러한 이유를 설명해줘.
+                                            결과를 다음 JSON 형식으로 반환해줘:
+                                            {{
+                                                "headline": "{headline}",
+                                                "confidence": 신뢰도,
+                                                "reason": "이유"
+                                            }}
+                                            """)
+
+        chain = prompt | llm | JsonOutputParser()
+        return chain.invoke({"headline": headline, "snippets": snippets})
