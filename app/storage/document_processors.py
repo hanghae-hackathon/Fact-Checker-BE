@@ -68,6 +68,9 @@ class DocumentProcessor:
         return loader.load()
     
     def fact_check_api(self, headline, snippets):
+        """
+        주어진 헤드라인과 검색 결과를 사용하여 사실 여부를 판단합니다.
+        """
         llm = ChatOpenAI(api_key=self.openai_api_key, temperature=0.0, model="gpt-4o")
         prompt = PromptTemplate.from_template("""
                                             헤드라인 = {headline}

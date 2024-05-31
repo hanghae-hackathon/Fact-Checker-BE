@@ -8,7 +8,6 @@ import os
 import re
 from storage.document_processors import DocumentProcessor
 
-
 app = Flask(__name__)
 env = dotenv_values()
 DP = DocumentProcessor()
@@ -20,6 +19,15 @@ youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
     developerKey=DEVELOPER_KEY)
 
 def get_video_duration(video_id):
+    """
+    주어진 유튜브 비디오 ID에 해당하는 비디오의 길이를 초 단위로 반환합니다.
+    
+    Args:
+        video_id (str): 유튜브 비디오 ID.
+    
+    Returns:
+        float: 비디오 길이(초).
+    """
     request = youtube.videos().list(
         part="contentDetails",
         id=video_id
@@ -34,6 +42,15 @@ def get_video_duration(video_id):
     return duration_seconds
 
 def extract_youtube_id(url):
+    """
+    주어진 URL에서 유튜브 비디오 ID를 추출합니다.
+    
+    Args:
+        url (str): 유튜브 비디오 URL.
+    
+    Returns:
+        str: 추출된 유튜브 비디오 ID.
+    """
     youtube_regex = re.compile(
         r'(https?://)?(www\.)?'
         '(youtube|youtu|youtube-nocookie)\.(com|be)/'
@@ -47,6 +64,15 @@ def extract_youtube_id(url):
         return None
 
 def check_url(url:str):
+    """
+    주어진 URL이 유효한 유튜브 비디오 URL인지 확인하고, 비디오 길이를 체크합니다.
+    
+    Args:
+        url (str): 유튜브 비디오 URL.
+    
+    Returns:
+        dict or str: 유효하지 않은 경우 에러 메시지, 유효한 경우 유튜브 비디오 ID.
+    """
     youtube_id = extract_youtube_id(url)
     if youtube_id:
         duration_seconds = get_video_duration(youtube_id)
@@ -62,6 +88,12 @@ def check_url(url:str):
     
 @app.route('/get-result', methods=['POST'])
 def execute_script():
+    """
+    주어진 URL을 처리하여 결과를 반환하는 엔드포인트.
+    
+    Returns:
+        Response: JSON 형식의 결과.
+    """
     data = request.get_json()
     requested_url = data.get('url')
     if not requested_url:
