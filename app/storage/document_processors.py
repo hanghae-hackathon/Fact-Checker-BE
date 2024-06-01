@@ -2,7 +2,7 @@ from .api_keys import APIKeys
 from langchain_core.prompts import PromptTemplate
 from langchain_community.chat_models import ChatOpenAI
 from langchain_community.utilities import SerpAPIWrapper
-from langchain_community.document_loaders import NewsURLLoader, YoutubeLoader
+from langchain_community.document_loaders import PlaywrightURLLoader, YoutubeLoader
 from langchain_core.output_parsers import JsonOutputParser
 
 class DocumentProcessor:
@@ -28,14 +28,17 @@ class DocumentProcessor:
         """
         return PromptTemplate.from_template(template)
 
-    def generate_headlines(self, document):
+    def generate_headlines(self, document, is_youtube):
         """
         주어진 문서를 사용하여 헤드라인을 생성합니다.
         """
         prompt = self.create_prompt_template()
         llm = ChatOpenAI(api_key=self.openai_api_key, model='gpt-3.5-turbo-16k',temperature=0.0)
         chain = prompt | llm
-        return chain.invoke({"text": document[0].page_content})
+        if is_youtube:
+            return chain.invoke({"text": document[0].page_content})
+        else:
+            return chain.invoke({"text": document[0]})
 
     def search_results(self, text):
         """
@@ -57,7 +60,7 @@ class DocumentProcessor:
         """
         주어진 URL 목록에서 뉴스 문서를 로드합니다.
         """
-        loader = NewsURLLoader(urls)
+        loader = PlaywrightURLLoader([urls])
         return loader.load()
 
     def load_youtube_documents(self, urls):

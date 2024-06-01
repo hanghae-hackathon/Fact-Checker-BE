@@ -112,8 +112,8 @@ def execute_script():
             else:
                 return jsonify(is_youtube), 400
         else:
-            script = DP.load_news_documents([requested_url])            
-        headline = DP.generate_headlines(script)
+            script = DP.load_news_documents(requested_url)            
+        headline = DP.generate_headlines(script, is_youtube)
         search_query = headline.content + "site:kbs.co.kr OR site:yna.co.kr OR site:chosun.com OR site:imbc.com OR site:sbs.co.kr OR site:jtbc.co.kr OR site:ytn.co.kr"
         serp_result = DP.search_results(search_query)
         if serp_result:
