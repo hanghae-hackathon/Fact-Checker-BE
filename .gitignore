@@ -163,3 +163,4 @@ cython_debug/
 test/
 fact-checker/
 *.pem
+app/nohup.out
