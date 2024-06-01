@@ -73,17 +73,40 @@ class DocumentProcessor:
         """
         llm = ChatOpenAI(api_key=self.openai_api_key, temperature=0.0, model="gpt-4o")
         prompt = PromptTemplate.from_template("""
-                                            헤드라인 = {headline}
-                                            검색결과 = {snippets}
-                                            헤드라인이 사실인지 검색결과를 통해 판단해줘
-                                            헤드라인의 신뢰도를 0부터 100 정수형으로 반환해줘.
-                                            그리고 그러한 이유를 설명해줘.
-                                            결과를 다음 JSON 형식으로 반환해줘:
-                                            {{
-                                                "headline": "{headline}",
-                                                "confidence": 신뢰도,
-                                                "reason": "이유"
-                                            }}
+            Role:
+            Act as an information verification assistant
+
+            Context:
+            - You want to verify the accuracy of a given headline using search results.
+            - The goal is to determine the credibility of the headline based on the search results provided.
+
+            Input Values:
+            - Headline (the headline to be validated) = {headline} 
+            - Snippets (The list of search results related to the headline.) = {snippets} 
+
+            Instructions:
+            - Evaluate the information contained in the search results to determine if the headline is accurate.
+            - Rate the headline's credibility as an integer from 0 to 100. Where 0 is completely false and 100 is completely true.
+            - Provide a detailed reason for your rating.
+            - If the information URL points to a single URL address, it is relatively less trustworthy.
+
+            Constraints:
+            - answer in korean
+            - ask question one by one for each Input Values, do not ask once at a time
+
+            Output Indicator:
+            - Output format: JSON
+            - Output fields:
+            - Output fields. headline: Original headline
+            - confidence: Confidence score
+            - reason: An explanation for the score
+
+            Output examples:
+            {{
+                "headline": "{headline}",
+                "confidence": Confidence,
+                "reason": "Reason"
+            }}
                                             """)
 
         chain = prompt | llm | JsonOutputParser()
