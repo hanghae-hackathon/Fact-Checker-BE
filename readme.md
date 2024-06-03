@@ -1,4 +1,3 @@
-```markdown
 # YouTube URL Processor
 
 이 프로젝트는 Flask를 사용하여 YouTube URL을 처리하고, 비디오 길이를 확인하며, 뉴스 문서와 유튜브 문서를 로드하여 헤드라인을 생성하고 검색 결과를 조회하는 기능을 제공합니다.
