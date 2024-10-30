@@ -62,6 +62,7 @@ python app/app.py
 - `load_news_documents(urls)`: 주어진 URL 목록에서 뉴스 문서를 로드합니다.
 - `load_youtube_documents(urls)`: 주어진 URL 목록에서 유튜브 문서를 로드합니다.
 - `fact_check_api(headline, snippets)`: 주어진 헤드라인과 검색 결과를 사용하여 사실 여부를 판단합니다.
+![active](https://github.com/user-attachments/assets/a06d21ca-3220-4fe9-8481-f2d1d6761843)
 
 ## API 엔드포인트
 
